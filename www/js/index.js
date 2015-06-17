@@ -54,7 +54,6 @@ var start = true;
 function loading() {
 	$( "#dot" ).animate({"margin-left": "100%"}, 2000, function(){
 		$(this).css("margin-left", "-3px");
-		console.log("start is " + start);
 		if(start) {
 			loading();
 		}
@@ -62,43 +61,88 @@ function loading() {
 }
 
 $(document).ready(function() {
+	SC.initialize({
+		client_id: "9efa09e998c48f23a554e02042d84a91"
+	});
 	
 	var $q = $('input[name="query"]');
 	var in_artist = false;
 	var section = "home";
+	var playing_id = "";
+	var playing_img;
 
 	$('#content').on('click', '.cell', displayArtistProfile);
+	$('#content').on('click', '.play', playSong);
 	$('#search').keypress(getSimilar); 
+	
+	function playSong() {
+		
+		playing_img = $(this);
+		if(!SC.sound || playing_id != $(this).parent().attr('id')) {
+			playing_img.attr("src", "img/pause.png");
+			start = true;
+			loading();
+			SC.stream("/tracks/"+$(this).parent().attr('id'), function(sound){
+				if(SC.sound) {
+					$('.play').each(function(i, v){ $(this).attr("src", "img/play.png") });
+					SC.sound.stop();
+				}
+				SC.sound = sound;
+				SC.sound.play();
+				playing_id = $(this).parent().attr('id');
+
+				start = false;
+			});
+		} else if(playing_id == $(this).parent().attr('id')) {
+			if(playing_img.attr("src") == "img/pause.png") { 
+				SC.sound.pause();
+				playing_img.attr("src", "img/play.png");
+			} else if(playing_img.attr("src") == "img/play.png") { 
+				SC.sound.play();
+				playing_img.attr("src", "img/pause.png");
+			}
+		}
+
+	}
 
 	function displayArtistProfile() {
-	
-		$('.cell').animate({left: '-400px', opacity: '0'}, 500, function(){}).queue(function(){
-		
+
 		var $name = $(this).children('h2').text();
-			var $tags = $(this).children('p').text();
-			var bg = $(this).css('background-image');
-			bg = bg.replace('url(','').replace(')','');
-			
-			var $html = "<div id='header'><span class='section' data-section='"+section+"'></span><h2>"+$name+"</h2><p>"+$tags+"</p></div>"
-			$('#content').html($html);
-			$('#header').css({
-				  'background-image': "url('"+bg+"')"
+		var $tags = $(this).children('p').text();
+		var bg = $(this).css('background-image');
+		bg = bg.replace('url(','').replace(')','');
+		var $html = "<div id='header'><span class='section' data-section='"+section+"'></span><h2>"+$name+"</h2><p>"+$tags+"</p></div>"
+		$('#content').html($html);
+		$('#header').css({'background-image': "url('"+bg+"')"});
+		in_artist = true;
+		var client_id = "9efa09e998c48f23a554e02042d84a91";
+		
+		SC.get('/tracks', { q: $name, license: '' }, function(tracks) {
+			console.debug(tracks);
+			tracks.sort(function (a, b) {
+			    return b.playback_count - a.playback_count;
 			});
-			in_artist = true;
-			var client_id = "9efa09e998c48f23a554e02042d84a91";
-			
-			var jsonSC;
-			var songs = "";
-			var urlSC = "http://api.soundcloud.com/search?client_id="+client_id+"&q="+$name;
-			$.get(urlSC, function(data, status) {
+			for(var i = 0; i < tracks.length; i++) {
+				if(!tracks[i].title.toLowerCase().includes("remix")) {
 				
-				jsonSC = data.collection;
-				console.debug(data);
-				songs = "<iframe width='100%' height='166' scrolling='no' frameborder='no' src='https://w.soundcloud.com/player/?url="+jsonSC[0].uri+"&color=0066cc'></iframe>";
-				$('#content').append(songs);
-				
+					$('#content').append("	<div class='song' id='"+tracks[i].id+"'>"+
+										 "		<img class='play' src='img/play.png'/>" +
+										 
+										 "		<p class='track_info'>" +
+										 "			<h4>"+tracks[i].title+"</h4>"+
+										 "			Uploader: <a href='"+tracks[i].permalink_url+"' target='_blank'>"+tracks[i].user.username+"</a>" + 
+										 "			<img src='img/logo_black.png' style='height: 8px; opacity: .6; float: right;'/>" +
+										 "		</p>" +
+										 "		<div class='clr'></div>" +
+										 "	</div>");
+					
+				}
+			}
+			$('.song').each(function(index, value){
+				$(this).css({"background-color": (index % 2 == 0 ? "#F5F5F5": "#EEE")}); 
 			});
-			});
+		});
+
 	}
 	
 	function getSimilar( event ) {
