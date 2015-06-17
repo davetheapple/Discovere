@@ -66,6 +66,7 @@ $(document).ready(function() {
 	var $q = $('input[name="query"]');
 	var in_artist = false;
 	var section = "home";
+	// this is fucking unbelievable fuck you github fuck you ukgckytckytcvuygvkuy
 
 	$('#content').on('click', '.cell', displayArtistProfile);
 	$('#search').keypress(getSimilar); 
