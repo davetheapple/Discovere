@@ -84,7 +84,7 @@ $(document).ready(function() {
 			playing_img.attr("src", "img/pause.png");
 			start = true;
 			loading();
-			SC.stream("/tracks/"+$(this).parent().attr('id'), function(sound){
+			SC.stream("http://api.soundcloud.com/tracks/"+$(this).parent().attr('id'), function(sound){
 				if(SC.sound) {
 					$('.play').each(function(i, v){ $(this).attr("src", "img/play.png") });
 					SC.sound.stop();
