@@ -68,12 +68,10 @@ $(document).ready(function() {
 	var $q = $('input[name="query"]');
 	var in_artist = false;
 	var section = "home";
-<<<<<<< HEAD
-	// this is fucking unbelievable fuck you github fuck you ukgckytckytcvuygvkuy
-=======
+
 	var playing_id = "";
 	var playing_img;
->>>>>>> newbranch
+
 
 	$('#content').on('click', '.cell', displayArtistProfile);
 	$('#content').on('click', '.play', playSong);
