@@ -193,6 +193,38 @@ input[name='query']:active {
 	opacity: .7;
 }
 
+.song {
+	text-align: left;
+	padding: 5px;
+}
+
+.track_info {
+	display: inline-block;
+}
+
+.play {
+	display: inline-block;
+	width: 40px;
+	margin-right: 5px;
+	float: left;
+}
+
+.track_info {
+	font-size: 6pt;
+	width: 100%;
+	float: right;
+}
+
+.track_info > img {
+	height: 6px;
+	opacity: .5;
+	float: right;
+}
+
+.clr {
+	clear: both;
+}
+
 
 .m-scene .scene_element {
   animation-duration: 0.25s;
