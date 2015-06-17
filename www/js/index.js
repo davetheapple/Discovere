@@ -119,6 +119,8 @@ $(document).ready(function() {
 		in_artist = true;
 		var client_id = "9efa09e998c48f23a554e02042d84a91";
 		
+		alert(SC);
+		
 		SC.get('/tracks', { q: $name, license: '' }, function(tracks) {
 			console.debug(tracks);
 			tracks.sort(function (a, b) {
