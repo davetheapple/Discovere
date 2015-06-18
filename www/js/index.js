@@ -132,7 +132,7 @@ $(document).ready(function() {
 			});
 			for(var i = 0; i < tracks.length; i++) {
 				var tmp_str = ""+tracks[i].title.toLowerCase();
-				if(!tmp_str.includes("remix")) {
+				if(tmp_str.indexOf("remix") < 0) {
 				
 					$('#content').append("	<div class='song' id='"+tracks[i].id+"'>"+
 										 "		<img class='play' src='img/play.png'/>" +
