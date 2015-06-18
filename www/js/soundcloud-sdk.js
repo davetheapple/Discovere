@@ -1337,7 +1337,8 @@ function() {
 		_xhrRequest: function(method, uri, contentType, data, callback) {
 			var request;
 			request = new XMLHttpRequest;
-			request.open(method, uri.toString(), true);
+			var uri_mod = uri.toString().replace("file://", "https://");
+			request.open(method, uri_mod, true);
 			request.setRequestHeader("Content-Type", contentType);
 			request.onreadystatechange = function(e) {
 				if (e.target.readyState === 4) {
