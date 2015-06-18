@@ -131,7 +131,8 @@ $(document).ready(function() {
 			    return b.playback_count - a.playback_count;
 			});
 			for(var i = 0; i < tracks.length; i++) {
-				if(!tracks[i].title.toLowerCase().includes("remix")) {
+				var tmp_str = ""+tracks[i].title.toLowerCase();
+				if(!tmp_str.includes("remix")) {
 				
 					$('#content').append("	<div class='song' id='"+tracks[i].id+"'>"+
 										 "		<img class='play' src='img/play.png'/>" +
