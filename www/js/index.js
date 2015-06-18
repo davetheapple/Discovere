@@ -61,8 +61,11 @@ function loading() {
 }
 
 $(document).ready(function() {
+
+	var clientID = "9efa09e998c48f23a554e02042d84a91";
+
 	SC.initialize({
-		client_id: "9efa09e998c48f23a554e02042d84a91"
+		client_id: clientID
 	});
 	
 	var $q = $('input[name="query"]');
@@ -84,7 +87,8 @@ $(document).ready(function() {
 			playing_img.attr("src", "img/pause.png");
 			start = true;
 			loading();
-			SC.stream("http://api.soundcloud.com/tracks/"+$(this).parent().attr('id'), function(sound){
+
+			SC.stream("/tracks/"+$(this).parent().attr('id'), function(sound){
 				if(SC.sound) {
 					$('.play').each(function(i, v){ $(this).attr("src", "img/play.png") });
 					SC.sound.stop();
