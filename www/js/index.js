@@ -157,8 +157,6 @@ $(document).ready(function() {
 			loading();
 			$q.blur();
 			in_artist = false;
-			url = "http://franciscompany.org/process_image/process.php?delete=true";
-			$.get(url, function(d) {});
 			
 			$('#content').html('');
 			
@@ -231,31 +229,6 @@ $(document).ready(function() {
 		      console.log("Size is " + request.getResponseHeader("Content-Length"));
 		    }
 		  });
-	/*
-		imgUrl = imagelist[attempt].url
-		var default_img;
-		var url = "http://franciscompany.org/process_image/process.php";
-		$.ajax({
-			type: 'GET',
-			dataType: 'text',
-			url: url,
-			data: {image: imgUrl},
-			success:function(data){
-				console.log("data: "+data);
-				console.debug(data);
-				default_img = "http://franciscompany.org/process_image/images/" + data;
-				$('#'+id).css('background-image', 'url('+default_img+')');
-			},
-			error: function(e) {
-				if(attempt < 5) {
-					fetchImage(id, imagelist, attempt+1);
-				} else {
-					default_img = 'img/placeholder' + Math.floor((Math.random()*3) + 1) + '.jpg';
-					$('#'+id).css('background-image', 'url('+default_img+')');
-				} 
-			}
-		});
-		*/
 	}
 
 
