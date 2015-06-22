@@ -42,6 +42,17 @@ var app = {
     }
 };
 
+
+/*
+ *	Disco.vere main application code 
+ */
+ 
+// 'global' variables
+var toggle_loading = true;
+var search_query = "";
+var clientID = "9efa09e998c48f23a554e02042d84a91";
+
+// use the android back key functionality [not implemented]
 function onBackKeyDown(evt) {
 	evt.preventDefault();
 	evt.stopPropagation();
@@ -50,42 +61,63 @@ function onBackKeyDown(evt) {
 	}
 }
 
-var start = true;
+// simple loading bar loop
 function loading() {
 	$( "#dot" ).animate({"margin-left": "100%"}, 2000, function(){
 		$(this).css("margin-left", "-3px");
-		if(start) {
+		if(toggle_loading) {
 			loading();
 		}
 	});
 }
 
-$(document).ready(function() {
+// callback for when the window has completely loaded
+$(window).load( function() { toggle_loading = false; } );
 
-	var clientID = "9efa09e998c48f23a554e02042d84a91";
+// when the document is ready, do stuff
+$(document).ready(function() {
 
 	SC.initialize({
 		client_id: clientID
 	});
-	
-	var $q = $('input[name="query"]');
-	var in_artist = false;
-	var section = "home";
 
 	var playing_id = "";
 	var playing_img;
 
-
 	$('#content').on('click', '.cell', displayArtistProfile);
 	$('#content').on('click', '.play', playSong);
-	$('#search').keypress(getSimilar); 
+	$('#search').keypress(getSimilar);
+	$('#auto_search').on('click', 'option', function() {
+		search_query = $(this).val();
+		var e = $.Event("keydown", { keyCode: 13}); //"keydown" if that's what you're doing
+		$("#search").trigger(e);
+		console.log("clicked option");
+		//getSimilar()
+	});
+
+	function autocomplete() {
+			console.log("auto complete fired");
+			var query = $('#query').val();
+			var url = 	"http://developer.echonest.com/api/v4/artist/suggest?api_key=" +
+						"DW2FLRWMOF77QF6S8" +
+						"&format=json" +
+						"&name=" + query +
+						"&results=5";
+
+			$.get(url, function(data, status) {
+				var a = data.response.artists;
+				for(var i = 0; i < a.length; i++) { 
+					$('#auto_search').append("<option value='"+a[i].name+"'>");
+				}
+			});
+	}
 	
 	function playSong() {
 		
 		playing_img = $(this);
 		if(!SC.sound || playing_id != $(this).parent().attr('id')) {
 			playing_img.attr("src", "img/pause.png");
-			start = true;
+			toggle_loading = true;
 			loading();
 
 			SC.stream("/tracks/"+$(this).parent().attr('id'), function(sound){
@@ -97,7 +129,7 @@ $(document).ready(function() {
 				SC.sound.play();
 				playing_id = $(this).parent().attr('id');
 
-				start = false;
+				toggle_loading = false;
 			});
 		} else if(playing_id == $(this).parent().attr('id')) {
 			if(playing_img.attr("src") == "img/pause.png") { 
@@ -118,6 +150,7 @@ $(document).ready(function() {
 		var bg = $(this).css('background-image');
 		bg = bg.replace('url(','').replace(')','');
 		var $html = "<div id='header'><span class='section' data-section='"+section+"'></span><h2>"+$name+"</h2><p>"+$tags+"</p></div>"
+		$html += "<div class='midbar'></div>";
 		$('#content').html($html);
 		$('#header').css({'background-image': "url('"+bg+"')"});
 		in_artist = true;
@@ -152,43 +185,53 @@ $(document).ready(function() {
 
 	}
 	
+	function runSearch( event ) {
+		
+	}
+	
 	function getSimilar( event ) {
-		var $q = $('input[name="query"]');
+		search_query = $('#query').val();
 		if ( event.which == 13 ) {
 			event.preventDefault();
-			start = true;
+			toggle_loading = true;
 			loading();
-			$q.blur();
-			in_artist = false;
+			$('#query').blur();
 			
 			$('#content').html('');
-			
-			var query = $q.val();
+
 			var url = 	"http://developer.echonest.com/api/v4/artist/search?api_key=" +
 						"DW2FLRWMOF77QF6S8" +
 						"&format=json" +
-						"&name=" + query +
+						"&name=" + search_query +
 						"&results=1" +
 						"&bucket=images" +
-						"&bucket=genre";
+						"&bucket=genre" +
+						"&bucket=biographies" +
+						"&bucket=songs" +
+						"&bucket=video";
 			
 			var $artists;
 			$.get(url, getArtist);
 			
+		} else if(search_query.length > 0) {
+			autocomplete();
 		}
 	}
 	
 	function getArtist(data, status) {
-		var query = $('input[name="query"]').val();
+		search_query = $('#query').val();
 		$artists = data.response.artists;
 		var similarUrl = 	"http://developer.echonest.com/api/v4/artist/similar?api_key=" +
 							"DW2FLRWMOF77QF6S8" +
 							"&format=json" +
-							"&name=" + query +
+							"&name=" + search_query +
 							"&results=10" +
 							"&bucket=images" +
-							"&bucket=genre";
-		
+							"&bucket=genre" +
+							"&bucket=biographies" +
+							"&bucket=songs" +
+							"&bucket=video";
+							
 		for(var index = 0; index < $artists.length; index++) {
 			//var imageUrl = $artists[index].images[0].url;
 			var id = 'art'+($artists.length > 1 ? index+1 : 0);
@@ -211,13 +254,13 @@ $(document).ready(function() {
 			//fetchImage(id, $artists[index].images, 0);
 			var img = $artists[index].images[0].url;
 			$('#'+id).css('background-image', 'url('+img+')');
-			$('.cell').css({height: '70px', opacity: '0.9'});
+			$('.cell').css({height: '70px', opacity: '0.7'});
 
 		}
 		if($artists.length == 1) { 
 			$.get(similarUrl, getArtist); 
 		}
-		if($artists.length > 1) start = false;
+		if($artists.length > 1) toggle_loading = false;
 		window.plugins.toast.show('(ﾉ≧∀≦)ﾉ Success!', 'long', 'bottom');
 				
 	}
