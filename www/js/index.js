@@ -153,10 +153,11 @@ $(document).ready(function() {
 		// get artst cell data
 		var $name = $(this).children('h2').text();
 		var $tags = $(this).children('p').text();
+		var videos = $(this).children('span');
 		
-		var video = {url: $(this).children('span').data('url'), site: $(this).children('span').data('site')};
-		var video_html = "http://www.dailymotion.com/embed/video/"+video.url.substring(video.url.indexOf("video/")+6, video.url.indexOf("_"));
-		console.log(video_html);
+		//var video = {url: $(this).children('span').data('url'), site: $(this).children('span').data('site')};
+		//var video_html = "http://www.dailymotion.com/embed/video/"+video.url.substring(video.url.indexOf("video/")+6, video.url.indexOf("_"));
+		//console.log(video_html);
 		
 		var bg = $(this).css('background-image').replace('url(','').replace(')','');
 		var section = "";
@@ -166,8 +167,14 @@ $(document).ready(function() {
 		$('#header').css({'background-image': "url('"+bg+"')"});
 		//in_artist = true;
 		var client_id = "9efa09e998c48f23a554e02042d84a91";
-		console.debug(video);
-		$('#content').append("<iframe src='"+video_html+"' width='100%' height='75px'></iframe>");
+		console.debug(videos);
+		
+		$(videos).each(function(i, v) {
+			var video = {url: $(this).data('url'), site: $(this).data('site')}
+			var video_html = "http://www.dailymotion.com/embed/video/"+video.url.substring(video.url.indexOf("video/")+6, video.url.indexOf("_"));
+			$('#content').append("<iframe src='"+video_html+"&network=cellular&quality=240&related=0' width='100%' height='75px'></iframe>");
+		});
+		//$('#content').append("<iframe src='"+video_html+"&network=cellular&quality=240&related=0' width='100%' height='75px'></iframe>");
 /*
 		SC.get('/tracks', { q: $name, license: '' }, function(tracks) {
 			console.debug(tracks);
@@ -258,9 +265,19 @@ $(document).ready(function() {
 			
 			var name = "<h2 id='name'>"+$artists[index].name+"</h2>";
 			console.debug($artists[index].video);
-			var youtube = "<span class='videos' data-url='"+$artists[index].video[0].url+"' data-site='"+$artists[index].video[0].site+"'></span>";
+			
+			var vidz = [];
+			var count = 0;
+			while(vidz.length < 5 && !(count >= $artists[index].video.length)) {
+				if($artists[index].video[count].site == "dailymotion.com")
+					vidz.push("<span class='videos' data-url='"+$artists[index].video[count].url+"' data-site='"+$artists[index].video[count].site+"'></span>");
+				count++;
+			}
+			
+			
+			//var youtube = "<span class='videos' data-url='"+$artists[index].video[0].url+"' data-site='"+$artists[index].video[0].site+"'></span>";
 			/*<a href="./page1" class="animsition-link">animsition link 1</a>*/
-			var cell = "<div class='cell' id='"+id+"'>"+name+tags+youtube+"</div>";
+			var cell = "<div class='cell' id='"+id+"'>"+name+tags+vidz.toString().replace(',', '')+"</div>";
 			
 			$('#content').append(cell);
 			
