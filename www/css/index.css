@@ -260,6 +260,10 @@ input[name='query']:active {
 	display: none;
 }
 
+iframe {
+	border: none;
+}
+
 
 .m-scene .scene_element {
   animation-duration: 0.25s;

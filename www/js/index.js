@@ -74,6 +74,16 @@ function loading() {
 // callback for when the window has completely loaded
 $(window).load( function() { toggle_loading = false; } );
 
+window.dmAsyncInit = function()
+    {
+        DM.init({apiKey: 'your app id', status: true, cookie: true});
+    };
+    (function() {
+        var e = document.createElement('script'); e.async = true;
+        e.src = document.location.protocol + '//api.dmcdn.net/all.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(e, s);
+    }());
+
 // when the document is ready, do stuff
 $(document).ready(function() {
 
@@ -167,12 +177,24 @@ $(document).ready(function() {
 		$('#header').css({'background-image': "url('"+bg+"')"});
 		//in_artist = true;
 		var client_id = "9efa09e998c48f23a554e02042d84a91";
+		var dailymo_key = "8defb804e5409cc66b5e";
+		
+		DM.init({
+	        apiKey: dailymo_key,
+	        status: true, // check login status
+	        cookie: true // enable cookies to allow the server to access the session
+	    });
+	    
+	    var player = DM.Player;
+		
 		console.debug(videos);
+		console.debug(player);
 		
 		$(videos).each(function(i, v) {
 			var video = {url: $(this).data('url'), site: $(this).data('site')}
-			var video_html = "http://www.dailymotion.com/embed/video/"+video.url.substring(video.url.indexOf("video/")+6, video.url.indexOf("_"));
-			$('#content').append("<iframe src='"+video_html+"&network=cellular&quality=240&related=0' width='100%' height='75px'></iframe>");
+			var vidID = video.url.substring(video.url.indexOf("video/")+6, video.url.indexOf("_"));
+			var video_html = "http://www.dailymotion.com/embed/video/"+vidID;
+			$('#content').append("<iframe src='"+video_html+"&network=cellular&quality=240&related=0&api=1' width='100%' height='75px'></iframe>");
 		});
 		//$('#content').append("<iframe src='"+video_html+"&network=cellular&quality=240&related=0' width='100%' height='75px'></iframe>");
 /*
