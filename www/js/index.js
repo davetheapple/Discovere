@@ -87,13 +87,6 @@ $(document).ready(function() {
 	$('#content').on('click', '.cell', displayArtistProfile);
 	$('#content').on('click', '.play', playSong);
 	$('#search').keypress(getSimilar);
-	$('#auto_search').on('click', 'option', function() {
-		search_query = $(this).val();
-		var e = $.Event("keydown", { keyCode: 13}); //"keydown" if that's what you're doing
-		$("#search").trigger(e);
-		console.log("clicked option");
-		//getSimilar()
-	});
 
 	function autocomplete() {
 			console.log("auto complete fired");
@@ -106,8 +99,20 @@ $(document).ready(function() {
 
 			$.get(url, function(data, status) {
 				var a = data.response.artists;
+				$('#auto_search').html('');
 				for(var i = 0; i < a.length; i++) { 
-					$('#auto_search').append("<option value='"+a[i].name+"'>");
+					var obj = $("<div class='suggest'>"+a[i].name+"</div>");
+					obj.on('click', function() {
+						search_query = $(this).text();
+						$('#auto_search').html('').toggle();
+						$('#query').val(search_query);
+						var e = $.Event("keydown", { keyCode: 13}); //"keydown" if that's what you're doing
+						e.which = 13;
+						getSimilar(e);
+						console.log("clicked option");
+						
+					});
+					$('#auto_search').append(obj);
 				}
 			});
 	}
@@ -144,18 +149,26 @@ $(document).ready(function() {
 	}
 
 	function displayArtistProfile() {
-
+		
+		// get artst cell data
 		var $name = $(this).children('h2').text();
 		var $tags = $(this).children('p').text();
-		var bg = $(this).css('background-image');
-		bg = bg.replace('url(','').replace(')','');
+		
+		var video = {url: $(this).children('span').data('url'), site: $(this).children('span').data('site')};
+		var video_html = "http://www.dailymotion.com/embed/video/"+video.url.substring(video.url.indexOf("video/")+6, video.url.indexOf("_"));
+		console.log(video_html);
+		
+		var bg = $(this).css('background-image').replace('url(','').replace(')','');
+		var section = "";
 		var $html = "<div id='header'><span class='section' data-section='"+section+"'></span><h2>"+$name+"</h2><p>"+$tags+"</p></div>"
 		$html += "<div class='midbar'></div>";
 		$('#content').html($html);
 		$('#header').css({'background-image': "url('"+bg+"')"});
-		in_artist = true;
+		//in_artist = true;
 		var client_id = "9efa09e998c48f23a554e02042d84a91";
-
+		console.debug(video);
+		$('#content').append("<iframe src='"+video_html+"' width='100%' height='75px'></iframe>");
+/*
 		SC.get('/tracks', { q: $name, license: '' }, function(tracks) {
 			console.debug(tracks);
 			tracks.sort(function (a, b) {
@@ -182,7 +195,7 @@ $(document).ready(function() {
 				$(this).css({"background-color": (index % 2 == 0 ? "#F5F5F5": "#EEE")}); 
 			});
 		});
-
+*/
 	}
 	
 	function runSearch( event ) {
@@ -194,6 +207,7 @@ $(document).ready(function() {
 		if ( event.which == 13 ) {
 			event.preventDefault();
 			toggle_loading = true;
+			$('#auto_search').html('').toggle();
 			loading();
 			$('#query').blur();
 			
@@ -231,20 +245,22 @@ $(document).ready(function() {
 							"&bucket=biographies" +
 							"&bucket=songs" +
 							"&bucket=video";
-							
+		console.debug($artists);
 		for(var index = 0; index < $artists.length; index++) {
 			//var imageUrl = $artists[index].images[0].url;
 			var id = 'art'+($artists.length > 1 ? index+1 : 0);
 			
-			var tags = "<p>"+$artists[index].genres[0].name+"</p>";
+			var tags = "<p>"+($artists[index].genres[0] != undefined ? $artists[index].genres[0].name : "")+"</p>";
 			//$($artists[index].genres).each(function(index, value){
 			//	tags += "#"+value.name+" ";
 			//});
 			//tags += "</p>";
 			
 			var name = "<h2 id='name'>"+$artists[index].name+"</h2>";
+			console.debug($artists[index].video);
+			var youtube = "<span class='videos' data-url='"+$artists[index].video[0].url+"' data-site='"+$artists[index].video[0].site+"'></span>";
 			/*<a href="./page1" class="animsition-link">animsition link 1</a>*/
-			var cell = "<div class='cell' id='"+id+"'>"+name+tags+"</div>";
+			var cell = "<div class='cell' id='"+id+"'>"+name+tags+youtube+"</div>";
 			
 			$('#content').append(cell);
 			

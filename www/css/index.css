@@ -168,11 +168,13 @@ input[name='query']:active {
 	border-bottom: solid thin white;
 	overflow: hidden;
 	z-index: 0;
-	background-size: cover;
+	background-size: 100%;
+	background-position-y: -100px;
 	color: white;
 	text-shadow: 1px 1px 1px black, -1px -1px 1px black;
 	text-align: left;
 	padding: 5px;
+	
 }
 
 .cell > * {
@@ -234,6 +236,29 @@ input[name='query']:active {
 	box-shadow: 0 0 3px #3b3b3b;
 }
 
+.suggest {
+	width: 100%;
+	
+	padding: 8px;
+	background: white;
+	margin: 0 auto;
+	border-top: solid thin #dadada;
+}
+
+#auto_search {
+	top: 48px;
+	left: 25%;
+	border-radius: 5px;
+	overflow: hidden;
+	height: auto;
+	position: fixed;
+	width: 80%;
+	margin: 0 auto;
+}
+
+.videos {
+	display: none;
+}
 
 
 .m-scene .scene_element {
